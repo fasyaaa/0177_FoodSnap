@@ -1,4 +1,4 @@
-# foody
+# FoodSnap
 
 A new Flutter project.
 
