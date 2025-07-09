@@ -1,31 +1,30 @@
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 class RegisterRequestModel {
-    final String name;
-    final String username;
-    final String email;
-    final String password;
+    final String? name;
+    final String? username;
+    final String? email;
+    final String? password;
 
     RegisterRequestModel({
-        required this.name,
-        required this.username,
-        required this.email,
-        required this.password,
+        this.name,
+        this.username,
+        this.email,
+        this.password,
     });
 
-    factory RegisterRequestModel.fromRawJson(String str) => RegisterRequestModel.fromJson(json.decode(str));
+    factory RegisterRequestModel.fromJson(String str) => RegisterRequestModel.fromMap(json.decode(str));
 
-    String toRawJson() => json.encode(toJson());
+    String toJson() => json.encode(toMap());
 
-    factory RegisterRequestModel.fromJson(Map<String, dynamic> json) => RegisterRequestModel(
+    factory RegisterRequestModel.fromMap(Map<String, dynamic> json) => RegisterRequestModel(
         name: json["name"],
         username: json["username"],
         email: json["email"],
         password: json["password"],
     );
 
-    Map<String, dynamic> toJson() => {
+    Map<String, dynamic> toMap() => {
         "name": name,
         "username": username,
         "email": email,
