@@ -7,6 +7,7 @@ import 'package:foody/core/constants/constants.dart';
 import 'package:foody/data/models/request/auth/login_request_model.dart';
 import 'package:foody/presentation/auth/bloc/login/login_bloc.dart';
 import 'package:foody/presentation/auth/bloc/register_screen.dart';
+import 'package:foody/presentation/home/admin_home_screen.dart';
 import 'package:foody/presentation/home/client_home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -103,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const AdminProfileScreen(),
+                            builder: (context) => const AdminHomeScreen(),
                           ),
                           (route) => false,
                         );
