@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 class LoginRequestModel {
-    final String? email;
+    final String? identity;
     final String? password;
 
     LoginRequestModel({
-        this.email,
+        this.identity,
         this.password,
     });
 
@@ -14,12 +14,12 @@ class LoginRequestModel {
     String toJson() => json.encode(toMap());
 
     factory LoginRequestModel.fromMap(Map<String, dynamic> json) => LoginRequestModel(
-        email: json["email"],
+        identity: json["identity"],
         password: json["password"],
     );
 
     Map<String, dynamic> toMap() => {
-        "email": email,
+        "identity": identity,
         "password": password,
     };
 }

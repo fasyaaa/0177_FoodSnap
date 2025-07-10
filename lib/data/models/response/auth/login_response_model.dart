@@ -31,6 +31,7 @@ class LoginResponseModel {
 class Data {
     final int? id;
     final String? name;
+    final String? username;
     final String? email;
     final String? role;
     final String? token;
@@ -38,6 +39,7 @@ class Data {
     Data({
         this.id,
         this.name,
+        this.username,
         this.email,
         this.role,
         this.token,
@@ -50,6 +52,7 @@ class Data {
     factory Data.fromMap(Map<String, dynamic> json) => Data(
         id: json["id"],
         name: json["name"],
+        username: json["username"],
         email: json["email"],
         role: json["role"],
         token: json["token"],
@@ -58,6 +61,7 @@ class Data {
     Map<String, dynamic> toMap() => {
         "id": id,
         "name": name,
+        "username": username,
         "email": email,
         "role": role,
         "token": token,
