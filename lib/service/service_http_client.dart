@@ -4,140 +4,99 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ServiceHttpClient {
   final String baseUrl = 'https://your-api-url.com/api';
-  final storage = FlutterSecureStorage();
+  final storage = const FlutterSecureStorage();
 
   Future<String?> _getToken() async {
-    return await storage.read(key: 'token');
+    return await storage.read(key: 'authToken');
   }
 
   Future<void> _saveToken(String token) async {
-    await storage.write(key: 'token', value: token);
+    await storage.write(key: 'authToken', value: token);
   }
 
   Future<void> _deleteToken() async {
-    await storage.delete(key: 'token');
+    await storage.delete(key: 'authToken');
   }
 
-  // ===== REGISTER =====
-  Future<http.Response> register(Map<String, dynamic> userData) async {
-    final url = Uri.parse('$baseUrl/auth/register');
-    final response = await http.post(
-      url,
-      body: jsonEncode(userData),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (response.statusCode == 201) {
-      final body = jsonDecode(response.body);
-      await _saveToken(body['token']);
-    }
-
-    return response;
-  }
-
-  // ===== LOGIN =====
-  Future<http.Response> login(String email, String password) async {
-    final url = Uri.parse('$baseUrl/auth/login');
-    final response = await http.post(
-      url,
-      body: jsonEncode({'email': email, 'password': password}),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    if (response.statusCode == 200) {
-      final body = jsonDecode(response.body);
-      await _saveToken(body['data']['token']);
-    }
-
-    return response;
-  }
-
-  // ===== GET CLIENTS (Admin only) =====
-  Future<http.Response> getClients() async {
+  // General POST method
+  Future<http.Response> post(String endpoint, Map<String, dynamic> body) async {
     final token = await _getToken();
-    final url = Uri.parse('$baseUrl/client');
+    final url = Uri.parse('$baseUrl/$endpoint');
+
+    return await http.post(
+      url,
+      headers: {
+        'Authorization': token != null ? 'Bearer $token' : '',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+  }
+
+  // General GET method
+  Future<http.Response> get(String endpoint) async {
+    final token = await _getToken();
+    final url = Uri.parse('$baseUrl/$endpoint');
 
     return await http.get(
       url,
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': token != null ? 'Bearer $token' : '',
         'Content-Type': 'application/json',
       },
     );
   }
 
-  // ===== CREATE FEED =====
-  Future<http.Response> createFeed(Map<String, dynamic> feedData) async {
+  // Multipart POST (for image upload etc.)
+  Future<http.Response> postMultipart(
+    String endpoint,
+    Map<String, dynamic> fields, {
+    String? fileField,
+    String? filePath,
+  }) async {
     final token = await _getToken();
-    final url = Uri.parse('$baseUrl/feeds');
+    final url = Uri.parse('$baseUrl/$endpoint');
 
-    final request =
-        http.MultipartRequest('POST', url)
-          ..headers['Authorization'] = 'Bearer $token'
-          ..fields.addAll(
-            feedData.map((key, value) => MapEntry(key, value.toString())),
-          );
-
-    if (feedData['img_feeds'] != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath(
-          'img_feeds',
-          feedData['img_feeds'],
-        ),
+    final request = http.MultipartRequest('POST', url)
+      ..headers['Authorization'] = token != null ? 'Bearer $token' : ''
+      ..fields.addAll(
+        fields.map((key, value) => MapEntry(key, value.toString())),
       );
+
+    if (fileField != null && filePath != null) {
+      request.files.add(await http.MultipartFile.fromPath(fileField, filePath));
     }
 
     final streamedResponse = await request.send();
     return await http.Response.fromStream(streamedResponse);
   }
 
-  // ===== COMMENT on feed =====
-  Future<http.Response> createComment(Map<String, dynamic> commentData) async {
+  // Optional: PUT method
+  Future<http.Response> put(String endpoint, Map<String, dynamic> body) async {
     final token = await _getToken();
-    final url = Uri.parse('$baseUrl/comments');
+    final url = Uri.parse('$baseUrl/$endpoint');
 
-    return await http.post(
+    return await http.put(
       url,
-      body: jsonEncode(commentData),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': token != null ? 'Bearer $token' : '',
         'Content-Type': 'application/json',
       },
+      body: jsonEncode(body),
     );
   }
 
-  // ===== GET comments on a feed =====
-  Future<http.Response> getComments(String feedId) async {
-    final url = Uri.parse('$baseUrl/comments/$feedId');
-    return await http.get(url);
-  }
-
-  // ===== SET Rating =====
-  Future<http.Response> setRating(String feedId, int rating) async {
+  // Optional: DELETE method
+  Future<http.Response> delete(String endpoint) async {
     final token = await _getToken();
-    final url = Uri.parse('$baseUrl/ratings');
+    final url = Uri.parse('$baseUrl/$endpoint');
 
-    return await http.post(
+    return await http.delete(
       url,
-      body: jsonEncode({'id_feeds': feedId, 'rating': rating}),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': token != null ? 'Bearer $token' : '',
         'Content-Type': 'application/json',
       },
     );
-  }
-
-  // ===== GET Feed Ratings =====
-  Future<http.Response> getRating(String feedId) async {
-    final url = Uri.parse('$baseUrl/ratings/$feedId');
-    return await http.get(url);
-  }
-
-  // ===== GET Logged-in User Rating =====
-  Future<http.Response> getUserRating(String feedId) async {
-    final token = await _getToken();
-    final url = Uri.parse('$baseUrl/ratings/user/$feedId');
-
-    return await http.get(url, headers: {'Authorization': 'Bearer $token'});
   }
 }
