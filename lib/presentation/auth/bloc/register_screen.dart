@@ -7,7 +7,7 @@ import 'package:foody/core/constants/colors.dart';
 import 'package:foody/data/models/request/auth/register_request_model.dart';
 import 'package:foody/presentation/auth/bloc/register/register_bloc.dart';
 import 'package:foody/presentation/auth/bloc/login_screen.dart';
-import 'package:foody/presentation/home/client_home_screen.dart';
+import 'package:foody/presentation/home/client/client_home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
