@@ -10,8 +10,8 @@ class CommentRepository {
 
   CommentRepository(this._httpClient);
 
-  /// Post a new comment (POST /comments)
-  Future<Either<String, CommentResponseModel>> createComment(CommentRequestModel model) async {
+  /// Create a new comment (POST /comments)
+  Future<Either<String, CommentResponseModel>> postComment(CommentRequestModel model) async {
     try {
       final response = await _httpClient.post(ApiPath.comments, model.toMap());
       final jsonResponse = json.decode(response.body);
@@ -20,22 +20,22 @@ class CommentRepository {
         final comment = CommentResponseModel.fromMap(jsonResponse['data']);
         return Right(comment);
       } else {
-        return Left(jsonResponse['message'] ?? "Failed to create comment");
+        return Left(jsonResponse['message'] ?? "Failed to post comment");
       }
     } catch (e) {
-      return Left("An error occurred while creating comment: $e");
+      return Left("An error occurred while posting comment: $e");
     }
   }
 
-  /// Get all comments for a feed (GET /comments?feedId={id})
-  Future<Either<String, List<CommentResponseModel>>> getCommentsByFeedId(int feedId) async {
+  /// Get all comments (GET /comments)
+  Future<Either<String, List<CommentResponseModel>>> getAllComments() async {
     try {
-      final response = await _httpClient.get('${ApiPath.comments}?feedId=$feedId');
+      final response = await _httpClient.get(ApiPath.comments);
       final jsonResponse = json.decode(response.body);
 
       if (response.statusCode == 200) {
         final List<CommentResponseModel> comments = (jsonResponse['data'] as List)
-            .map((item) => CommentResponseModel.fromMap(item))
+            .map((e) => CommentResponseModel.fromMap(e))
             .toList();
         return Right(comments);
       } else {
@@ -46,27 +46,29 @@ class CommentRepository {
     }
   }
 
-  /// Get a single comment by ID (GET /comments/{id})
-  Future<Either<String, CommentResponseModel>> getCommentById(int id) async {
+  /// Get comments for a specific feed (GET /comments/feeds/{feedId})
+  Future<Either<String, List<CommentResponseModel>>> getCommentsByFeedId(int feedId) async {
     try {
-      final response = await _httpClient.get('${ApiPath.comments}/$id');
+      final response = await _httpClient.get('${ApiPath.comments}/feeds/$feedId');
       final jsonResponse = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        final comment = CommentResponseModel.fromMap(jsonResponse['data']);
-        return Right(comment);
+        final List<CommentResponseModel> comments = (jsonResponse['data'] as List)
+            .map((e) => CommentResponseModel.fromMap(e))
+            .toList();
+        return Right(comments);
       } else {
-        return Left(jsonResponse['message'] ?? "Comment not found");
+        return Left(jsonResponse['message'] ?? "Failed to fetch comments for feed");
       }
     } catch (e) {
-      return Left("An error occurred while fetching comment: $e");
+      return Left("An error occurred while fetching comments for feed: $e");
     }
   }
 
-  /// Delete comment (DELETE /comments/{id})
-  Future<Either<String, String>> deleteComment(int id) async {
+  /// Delete a comment by ID (DELETE /comments/{id})
+  Future<Either<String, String>> deleteComment(int commentId) async {
     try {
-      final response = await _httpClient.delete('${ApiPath.comments}/$id');
+      final response = await _httpClient.delete('${ApiPath.comments}/$commentId');
       final jsonResponse = json.decode(response.body);
 
       if (response.statusCode == 200) {
