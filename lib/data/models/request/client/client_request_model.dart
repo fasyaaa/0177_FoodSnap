@@ -6,7 +6,7 @@ class ClientRequestModel {
   final String? email;
   final String? password;
   final String? gender;
-  final String? imgProfile; // base64 image string
+  final String? imgProfile;
 
   ClientRequestModel({
     this.name,
