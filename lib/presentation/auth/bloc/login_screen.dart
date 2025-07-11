@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   );
                                 }
                               },
-                      label: state is LoginLoading ? 'Loading...' : 'In',
+                      label: state is LoginLoading ? 'Loading...' : 'Login',
                     );
                   },
                 ),
