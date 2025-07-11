@@ -40,7 +40,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     usernameController.dispose();
     emailController.dispose();
     passwordController.dispose();
-    _key.currentState?.dispose();
     super.dispose();
   }
 
@@ -57,7 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 const SpaceHeight(100),
                 Text(
-                  'DAFTAR AKUN BARU',
+                  'Sign Up',
                   style: TextStyle(
                     fontSize: MediaQuery.of(context).size.width * 0.05,
                     fontWeight: FontWeight.bold,
@@ -65,9 +64,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SpaceHeight(30),
                 CustomTextField(
-                  validator: 'Nama tidak boleh kosong',
+                  validator: "Name can't be empty",
                   controller: namaController,
-                  label: 'Nama',
+                  label: 'Name',
                   prefixIcon: const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Icon(Icons.person),
@@ -75,7 +74,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SpaceHeight(25),
                 CustomTextField(
-                  validator: 'Username tidak boleh kosong',
+                  validator: "Username can't be empty",
                   controller: usernameController,
                   label: 'Username',
                   prefixIcon: const Padding(
@@ -85,7 +84,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SpaceHeight(25),
                 CustomTextField(
-                  validator: 'Email tidak boleh kosong',
+                  validator: "Email can't be empty",
                   controller: emailController,
                   label: 'Email',
                   prefixIcon: const Padding(
@@ -98,7 +97,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     Expanded(
                       child: CustomTextField(
-                        validator: 'Password tidak boleh kosong',
+                        validator: "Password can't be empty",
                         controller: passwordController,
                         label: 'Password',
                         obscureText: !isShowPassword,
@@ -166,21 +165,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   );
                                 }
                               },
-                      label: state is RegisterLoading ? 'Memuat...' : 'Daftar',
+                      label: state is RegisterLoading ? 'Loading...' : 'Register',
                     );
                   },
                 ),
                 const SpaceHeight(20),
                 Text.rich(
                   TextSpan(
-                    text: 'Sudah memiliki akun? Silahkan ',
+                    text: 'Have an Account ? Please ',
                     style: TextStyle(
                       color: AppColors.grey,
                       fontSize: MediaQuery.of(context).size.width * 0.03,
                     ),
                     children: [
                       TextSpan(
-                        text: 'Login disini',
+                        text: 'Login',
                         style: TextStyle(color: AppColors.primary),
                         recognizer:
                             TapGestureRecognizer()

@@ -2,7 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foody/core/components/components.dart';
-import 'package:foody/core/components/spaces.dart';
 import 'package:foody/core/constants/constants.dart';
 import 'package:foody/data/models/request/auth/login_request_model.dart';
 import 'package:foody/presentation/auth/bloc/login/login_bloc.dart';
@@ -35,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void dispose() {
     identityController.dispose();
     passwordController.dispose();
-    _key.currentState?.dispose();
     super.dispose();
   }
 
@@ -52,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SpaceHeight(170),
                 Text(
-                  'SELAMAT DATANG KEMBALI',
+                  'Welcome',
                   style: TextStyle(
                     fontSize: MediaQuery.of(context).size.width * 0.05,
                     fontWeight: FontWeight.bold,
@@ -60,9 +58,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SpaceHeight(30),
                 CustomTextField(
-                  validator: 'Email tidak boleh kosong',
+                  validator: "Email or Username can't be empty",
                   controller: identityController,
-                  label: 'Email',
+                  label: 'Email or Username',
                   prefixIcon: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Icon(Icons.email),
@@ -70,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SpaceHeight(25),
                 CustomTextField(
-                  validator: 'Password tidak boleh kosong',
+                  validator: "Password can't be empty",
                   controller: passwordController,
                   label: 'Password',
                   obscureText: !isShowPassword,
@@ -100,6 +98,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     } else if (state is LoginSuccess) {
                       final role =
                           state.responseModel.data?.role?.toLowerCase();
+                      if (!mounted) return;
+
                       if (role == 'admin') {
                         Navigator.pushAndRemoveUntil(
                           context,
@@ -112,16 +112,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(state.responseModel.message!)),
                         );
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const ClientHomeScreen(),
-                          ),
-                          (route) => false,
-                        );
+                        Future.delayed(Duration(milliseconds: 300), () {
+                          if (mounted) {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ClientHomeScreen(),
+                              ),
+                              (route) => false,
+                            );
+                          }
+                        });
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Role tidak dikenali')),
+                          const SnackBar(content: Text('Unknown Role')),
                         );
                       }
                     }
@@ -142,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   );
                                 }
                               },
-                      label: state is LoginLoading ? 'Memuat...' : 'Masuk',
+                      label: state is LoginLoading ? 'Loading...' : 'In',
                     );
                   },
                 ),
@@ -150,25 +154,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SpaceHeight(20),
                 Text.rich(
                   TextSpan(
-                    text: 'Belum memiliki akun? Silahkan ',
+                    text: "Don't have an Account ? Please ",
                     style: TextStyle(
                       color: AppColors.grey,
                       fontSize: MediaQuery.of(context).size.width * 0.03,
                     ),
                     children: [
                       TextSpan(
-                        text: 'Daftar disini!',
+                        text: 'Sign Up!',
                         style: TextStyle(color: AppColors.primary),
                         recognizer:
                             TapGestureRecognizer()
                               ..onTap = () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder:
-                                        (context) => const RegisterScreen(),
-                                  ),
-                                );
+                                Navigator.pushNamed(context, '/register');
                               },
                       ),
                     ],
