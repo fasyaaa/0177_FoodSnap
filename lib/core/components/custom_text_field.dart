@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
 import 'spaces.dart';
+import '../constants/colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final String validator;
@@ -41,6 +41,7 @@ class CustomTextField extends StatelessWidget {
             style: TextStyle(
               fontSize: MediaQuery.of(context).size.width * 0.03,
               fontWeight: FontWeight.w700,
+              color: AppColors.white,
             ),
           ),
           const SpaceHeight(12.0),
@@ -58,18 +59,28 @@ class CustomTextField extends StatelessWidget {
           obscureText: obscureText,
           keyboardType: keyboardType,
           readOnly: readOnly,
+          maxLines: maxLines,
+          style: const TextStyle(color: AppColors.white),
           decoration: InputDecoration(
+            filled: true,
+            fillColor: AppColors.background,
+            hintText: label,
+            hintStyle: const TextStyle(color: AppColors.light),
+            labelStyle: const TextStyle(color: AppColors.light),
             prefixIcon: prefixIcon,
             suffixIcon: suffixIcon,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.0),
-              borderSide: const BorderSide(color: Colors.grey),
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: const BorderSide(color: AppColors.background),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16.0),
-              borderSide: const BorderSide(color: Colors.grey),
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: const BorderSide(color: AppColors.background),
             ),
-            hintText: label,
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8.0),
+              borderSide: const BorderSide(color: AppColors.light),
+            ),
           ),
         ),
       ],

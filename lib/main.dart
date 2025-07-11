@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foody/data/repository/auth_repository.dart';
 import 'package:foody/presentation/auth/bloc/login/login_bloc.dart';
 import 'package:foody/presentation/auth/bloc/register/register_bloc.dart';
-import 'package:foody/presentation/auth/bloc/login_screen.dart';
-import 'package:foody/presentation/auth/bloc/register_screen.dart';
+import 'package:foody/presentation/auth/login_screen.dart';
+import 'package:foody/presentation/auth/register_screen.dart';
 import 'package:foody/service/service_http_client.dart';
 
 void main() {
