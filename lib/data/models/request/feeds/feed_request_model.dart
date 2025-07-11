@@ -6,6 +6,7 @@ class FeedsRequestModel {
     final String? locationName;
     final double? latitude;
     final double? longitude;
+    final String? imgFeeds;
 
     FeedsRequestModel({
         this.title,
@@ -13,6 +14,7 @@ class FeedsRequestModel {
         this.locationName,
         this.latitude,
         this.longitude,
+        this.imgFeeds,
     });
 
     factory FeedsRequestModel.fromJson(String str) => FeedsRequestModel.fromMap(json.decode(str));
@@ -25,6 +27,7 @@ class FeedsRequestModel {
         locationName: json["location_name"],
         latitude: json["latitude"]?.toDouble(),
         longitude: json["longitude"]?.toDouble(),
+        imgFeeds: json["img_feeds"],
     );
 
     Map<String, dynamic> toMap() => {
@@ -33,5 +36,6 @@ class FeedsRequestModel {
         "location_name": locationName,
         "latitude": latitude,
         "longitude": longitude,
+        "img_feeds": imgFeeds,
     };
 }
