@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ServiceHttpClient {
-  final String baseUrl = 'https://your-api-url.com/api';
+  final String baseUrl = 'http://10.0.2.2:3000/api';
   final storage = const FlutterSecureStorage();
 
   Future<String?> _getToken() async {
