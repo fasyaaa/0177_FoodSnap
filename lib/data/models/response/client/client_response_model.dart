@@ -7,6 +7,7 @@ class ClientResponseModel {
     final String? email;
     final String? gender;
     final String? role;
+    final String? imgProfile;
     final DateTime? createdAtClient;
     final DateTime? updateAtClient;
 
@@ -16,6 +17,7 @@ class ClientResponseModel {
         this.username,
         this.email,
         this.gender,
+        this.imgProfile,
         this.role,
         this.createdAtClient,
         this.updateAtClient,
@@ -31,6 +33,7 @@ class ClientResponseModel {
         username: json["username"],
         email: json["email"],
         gender: json["gender"],
+        imgProfile: json["img_profile"],
         role: json["role"],
         createdAtClient: json["created_at_client"] == null ? null : DateTime.parse(json["created_at_client"]),
         updateAtClient: json["update_at_client"] == null ? null : DateTime.parse(json["update_at_client"]),
@@ -42,6 +45,7 @@ class ClientResponseModel {
         "username": username,
         "email": email,
         "gender": gender,
+        "img_profile": imgProfile,
         "role": role,
         "created_at_client": createdAtClient?.toIso8601String(),
         "update_at_client": updateAtClient?.toIso8601String(),
