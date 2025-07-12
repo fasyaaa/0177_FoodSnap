@@ -34,16 +34,20 @@ class MyApp extends StatelessWidget {
           create: (_) => RegisterBloc(authRepository: authRepository),
         ),
         BlocProvider<ClientHomeBloc>(
-          create: (_) => ClientHomeBloc(feedRepository, commentRepository)..add(LoadFeeds()),
+          create:
+              (_) =>
+                  ClientHomeBloc(feedRepository, commentRepository)
+                    ..add(LoadFeeds()),
         ),
       ],
       child: MaterialApp(
         title: 'FoodSnap',
+        debugShowCheckedModeBanner: false,
         initialRoute: '/',
         routes: {
           '/': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
-         '/home': (context) => const ClientHomeScreen(),
+          '/home': (context) => const ClientHomeScreen(),
         },
       ),
     );
