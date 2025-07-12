@@ -27,7 +27,15 @@ class ClientHomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const HeadBar(),
+      appBar: HeadBar(
+        currentRoute: '/home',
+        onTabSelected: (route) {
+          if (route != '/home') {
+            Navigator.pushNamed(context, route);
+          }
+        },
+      ),
+
       body: BlocBuilder<ClientHomeBloc, ClientHomeState>(
         builder: (context, state) {
           if (state.isLoading) {
@@ -64,19 +72,28 @@ class ClientHomeScreen extends StatelessWidget {
                   children: [
                     // Header: Profile & Name
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                       child: Row(
                         children: [
                           SvgPicture.asset(
                             'assets/icons/profile_empty.svg',
                             width: 36,
                             height: 36,
-                            colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
+                            colorFilter: const ColorFilter.mode(
+                              AppColors.white,
+                              BlendMode.srcIn,
+                            ),
                           ),
                           const SizedBox(width: 8),
                           Text(
                             username,
-                            style: const TextStyle(color: AppColors.white, fontSize: 14),
+                            style: const TextStyle(
+                              color: AppColors.white,
+                              fontSize: 14,
+                            ),
                           ),
                         ],
                       ),
@@ -85,25 +102,29 @@ class ClientHomeScreen extends StatelessWidget {
                     // Image
                     AspectRatio(
                       aspectRatio: 1,
-                      child: imageBytes != null
-                          ? Image.memory(
-                              Uint8List.fromList(imageBytes),
-                              fit: BoxFit.cover,
-                            )
-                          : Container(
-                              color: AppColors.grey,
-                              child: const Center(
-                                child: Text(
-                                  'image dari gallery',
-                                  style: TextStyle(color: Colors.white),
+                      child:
+                          imageBytes != null
+                              ? Image.memory(
+                                Uint8List.fromList(imageBytes),
+                                fit: BoxFit.cover,
+                              )
+                              : Container(
+                                color: AppColors.grey,
+                                child: const Center(
+                                  child: Text(
+                                    'image dari gallery',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
                               ),
-                            ),
                     ),
 
                     // Footer (comments, caption, time)
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 10,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -114,12 +135,16 @@ class ClientHomeScreen extends StatelessWidget {
                                 isScrollControlled: true,
                                 backgroundColor: AppColors.lightSheet,
                                 shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(16),
+                                  ),
                                 ),
                                 builder: (context) {
                                   return FractionallySizedBox(
                                     heightFactor: 0.6,
-                                    child: CommentBottomSheet(feedId: feed.idFeeds!),
+                                    child: CommentBottomSheet(
+                                      feedId: feed.idFeeds!,
+                                    ),
                                   );
                                 },
                               );
@@ -130,12 +155,18 @@ class ClientHomeScreen extends StatelessWidget {
                                   'assets/icons/comment_empty.svg',
                                   width: 20,
                                   height: 20,
-                                  colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
+                                  colorFilter: const ColorFilter.mode(
+                                    AppColors.white,
+                                    BlendMode.srcIn,
+                                  ),
                                 ),
                                 const SizedBox(width: 4),
                                 Text(
                                   '$commentCount',
-                                  style: const TextStyle(color: AppColors.white, fontSize: 14),
+                                  style: const TextStyle(
+                                    color: AppColors.white,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ],
                             ),
@@ -143,11 +174,16 @@ class ClientHomeScreen extends StatelessWidget {
                           const SizedBox(height: 8),
                           RichText(
                             text: TextSpan(
-                              style: const TextStyle(color: AppColors.white, fontSize: 14),
+                              style: const TextStyle(
+                                color: AppColors.white,
+                                fontSize: 14,
+                              ),
                               children: [
                                 TextSpan(
                                   text: username,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const TextSpan(text: '  '),
                                 TextSpan(text: caption),
