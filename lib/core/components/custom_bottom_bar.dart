@@ -73,7 +73,7 @@ class CustomBottomBar extends StatelessWidget {
                 : SvgPicture.asset(
                     currentRoute == '/profile'
                         ? 'assets/icons/profile_fill.svg'
-                        : 'assets/icons/bookmark_empty.svg', // fallback icon
+                        : 'assets/icons/profile_empty.svg',
                     width: 26,
                     height: 26,
                     colorFilter:
