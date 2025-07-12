@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:foody/core/constants/colors.dart';
 
 class HeadBar extends StatelessWidget implements PreferredSizeWidget {
-  const HeadBar({super.key});
+  final String currentRoute;
+  final void Function(String) onTabSelected;
+
+  const HeadBar({
+    super.key,
+    required this.currentRoute,
+    required this.onTabSelected,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -10,16 +18,44 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: AppColors.background,
       elevation: 0,
       titleSpacing: 16,
-      title: const Text(
-        'Food Snap',
-        style: TextStyle(
-          color: AppColors.white,
-          fontSize: 26,
-          fontFamily: 'Billabong',
-          fontWeight: FontWeight.w400,
-        ),
-      ),
       automaticallyImplyLeading: false,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Food Snap',
+            style: TextStyle(
+              color: AppColors.white,
+              fontSize: 26,
+              fontFamily: 'Billabong',
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          _buildIconButton(
+            isActive: currentRoute == '/addPost',
+            activeAsset: 'assets/icons/plus_fill.svg',
+            inactiveAsset: 'assets/icons/plus_empty.svg',
+            onTap: () => onTabSelected('/addPost'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildIconButton({
+    required bool isActive,
+    required String activeAsset,
+    required String inactiveAsset,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: SvgPicture.asset(
+        isActive ? activeAsset : inactiveAsset,
+        height: 24,
+        width: 24,
+        color: AppColors.white,
+      ),
     );
   }
 
