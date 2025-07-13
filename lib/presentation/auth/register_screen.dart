@@ -45,21 +45,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  InputDecoration _buildInputDecoration(String label) {
-    return InputDecoration(
-      labelText: label.toLowerCase(),
-      labelStyle: const TextStyle(color: AppColors.light),
-      filled: true,
-      fillColor: AppColors.grey.withOpacity(0.4),
-      hintText: label.toLowerCase(),
-      hintStyle: const TextStyle(color: AppColors.light),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide.none,
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final logo = SvgPicture.asset('assets/images/onlylogo.svg', height: 70);
@@ -113,27 +98,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 label: 'Name',
                 validator: "Name can't be empty",
               ),
-
               const SpaceHeight(20),
-
               // Username
               CustomTextField(
                 controller: usernameController,
                 label: 'Username',
                 validator: "Username can't be empty",
               ),
-
               const SpaceHeight(20),
-
               // Email
               CustomTextField(
                 controller: emailController,
                 label: 'Email',
                 validator: "Email can't be empty",
               ),
-
               const SpaceHeight(20),
-
               // Password
               CustomTextField(
                 controller: passwordController,
@@ -152,11 +131,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
               ),
-
               const SpaceHeight(40),
               BlocConsumer<RegisterBloc, RegisterState>(
                 listener: (context, state) {
                   if (state is RegisterSuccess) {
+                    // Logika penyimpanan sudah di repository, kita hanya perlu navigasi
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
@@ -166,7 +145,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     );
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(state.message),
+                        // DIUBAH: Ambil pesan dari model respons
+                        content: Text(
+                          state.response.message ?? 'Register Success!',
+                        ),
                         backgroundColor: AppColors.primary,
                       ),
                     );

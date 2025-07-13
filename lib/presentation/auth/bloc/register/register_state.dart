@@ -8,8 +8,9 @@ final class RegisterInitial extends RegisterState {}
 final class RegisterLoading extends RegisterState {}
 
 final class RegisterSuccess extends RegisterState {
-  final String message;
-  RegisterSuccess({required this.message});
+  // DIUBAH: Bawa LoginResponseModel
+  final RegisterResponseModel response;
+  RegisterSuccess({required this.response});
 }
 
 final class RegisterFailure extends RegisterState {
