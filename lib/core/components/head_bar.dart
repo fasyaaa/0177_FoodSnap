@@ -6,10 +6,14 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
   final String currentRoute;
   final void Function(String) onTabSelected;
 
+  /// Teks yang akan ditampilkan sebagai judul. Default: 'Food Snap'
+  final String titleText;
+
   const HeadBar({
     super.key,
     required this.currentRoute,
     required this.onTabSelected,
+    this.titleText = 'Food Snap',
   });
 
   @override
@@ -22,9 +26,9 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text(
-            'Food Snap',
-            style: TextStyle(
+          Text(
+            titleText,
+            style: const TextStyle(
               color: AppColors.white,
               fontSize: 26,
               fontFamily: 'Billabong',
