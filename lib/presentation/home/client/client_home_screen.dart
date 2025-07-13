@@ -1,240 +1,93 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:foody/core/components/custom_bottom_bar.dart';
-import 'package:foody/core/components/head_bar.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:foody/data/repository/client_repository.dart';
 import 'package:foody/presentation/home/client/bloc/client_home_bloc.dart';
-import 'package:intl/intl.dart';
-import 'package:foody/core/constants/colors.dart';
+import 'package:foody/presentation/home/client/widgets/home_view.dart';
 
-class ClientHomeScreen extends StatelessWidget {
+class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({super.key});
 
-  String _formatTime(DateTime uploadTime) {
-    final duration = DateTime.now().difference(uploadTime);
+  @override
+  State<ClientHomeScreen> createState() => _ClientHomeScreenState();
+}
 
-    if (duration.inMinutes < 60) {
-      return '${duration.inMinutes}m';
-    } else if (duration.inHours < 24) {
-      return '${duration.inHours}h';
+class _ClientHomeScreenState extends State<ClientHomeScreen> {
+  final _storage = const FlutterSecureStorage();
+  int? _loggedInClientId;
+  Uint8List? _loggedInProfileImageBytes;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<ClientHomeBloc>().add(LoadFeeds());
+    _loadLoggedInClientData();
+  }
+
+  Future<void> _loadLoggedInClientData() async {
+    final clientIdStr = await _storage.read(key: 'clientId');
+    if (clientIdStr == null) {
+      print("No client ID found in storage after login.");
+      return;
+    }
+
+    final id = int.tryParse(clientIdStr);
+    if (id == null) return;
+
+    setState(() {
+      _loggedInClientId = id;
+    });
+
+    final clientRepo = RepositoryProvider.of<ClientRepository>(context);
+    final result = await clientRepo.getClientById(id);
+
+    result.fold(
+      (error) => print("Error fetching client profile for bottom bar: $error"),
+      (client) {
+        if (client.imgProfile != null && client.imgProfile!.isNotEmpty) {
+          try {
+            setState(() {
+              _loggedInProfileImageBytes = base64Decode(client.imgProfile!);
+            });
+          } catch (e) {
+            print("Error decoding profile image base64 for bottom bar: $e");
+          }
+        }
+      },
+    );
+  }
+
+  void _onTabSelected(String route) {
+    final currentRoute = ModalRoute.of(context)?.settings.name;
+    if (currentRoute == route) return;
+
+    if (route == '/profile') {
+      if (_loggedInClientId != null) {
+        Navigator.pushNamed(context, route, arguments: _loggedInClientId);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Client ID not available. Please login again.")),
+        );
+      }
     } else {
-      return '${duration.inDays}d';
+      Navigator.pushNamed(context, route);
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: HeadBar(
-        currentRoute: '/home',
-        onTabSelected: (route) {
-          if (route != '/home') {
-            Navigator.pushNamed(context, route);
-          }
-        },
-      ),
-
-      body: BlocBuilder<ClientHomeBloc, ClientHomeState>(
-        builder: (context, state) {
-          if (state.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-
-          if (state.feeds.isEmpty) {
-            return const Center(
-              child: Text(
-                'No Posts Available',
-                style: TextStyle(color: AppColors.white),
-              ),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              context.read<ClientHomeBloc>().add(RefreshFeeds());
-            },
-            child: ListView.builder(
-              padding: const EdgeInsets.only(bottom: 80),
-              itemCount: state.feeds.length,
-              itemBuilder: (context, index) {
-                final feed = state.feeds[index];
-
-                final username = feed.clientName ?? 'Unknown';
-                final caption = feed.description ?? '';
-                final commentCount = 0; // belum tersedia di response
-                final uploadDate = feed.createdAtFeeds ?? DateTime.now();
-                final imageBytes = feed.imgFeeds;
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header: Profile & Name
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      child: Row(
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/profile_empty.svg',
-                            width: 36,
-                            height: 36,
-                            colorFilter: const ColorFilter.mode(
-                              AppColors.white,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            username,
-                            style: const TextStyle(
-                              color: AppColors.white,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Image
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child:
-                          imageBytes != null
-                              ? Image.memory(
-                                Uint8List.fromList(imageBytes),
-                                fit: BoxFit.cover,
-                              )
-                              : Container(
-                                color: AppColors.grey,
-                                child: const Center(
-                                  child: Text(
-                                    'image dari gallery',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                    ),
-
-                    // Footer (comments, caption, time)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 10,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: AppColors.lightSheet,
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(16),
-                                  ),
-                                ),
-                                builder: (context) {
-                                  return FractionallySizedBox(
-                                    heightFactor: 0.6,
-                                    child: CommentBottomSheet(
-                                      feedId: feed.idFeeds!,
-                                    ),
-                                  );
-                                },
-                              );
-                            },
-                            child: Row(
-                              children: [
-                                SvgPicture.asset(
-                                  'assets/icons/comment_empty.svg',
-                                  width: 20,
-                                  height: 20,
-                                  colorFilter: const ColorFilter.mode(
-                                    AppColors.white,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '$commentCount',
-                                  style: const TextStyle(
-                                    color: AppColors.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          RichText(
-                            text: TextSpan(
-                              style: const TextStyle(
-                                color: AppColors.white,
-                                fontSize: 14,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: username,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const TextSpan(text: '  '),
-                                TextSpan(text: caption),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            _formatTime(uploadDate),
-                            style: const TextStyle(
-                              color: AppColors.grey,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                );
-              },
-            ),
-          );
-        },
-      ),
-      bottomNavigationBar: CustomBottomBar(
-        currentRoute: '/home',
-        onTabSelected: (route) {
-          if (route != '/home') {
-            Navigator.pushNamed(context, route);
-          }
-        },
-        profileImageUrl: null,
-      ),
-    );
+  Future<void> _onRefresh() async {
+    context.read<ClientHomeBloc>().add(RefreshFeeds());
+    await _loadLoggedInClientData();
   }
-}
-
-// CommentBottomSheet sementara
-class CommentBottomSheet extends StatelessWidget {
-  final int feedId;
-
-  const CommentBottomSheet({super.key, required this.feedId});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        "Comments untuk Feed ID: $feedId",
-        style: const TextStyle(color: AppColors.white),
-      ),
+    return HomeView(
+      onTabSelected: _onTabSelected,
+      onRefresh: _onRefresh,
+      loggedInClientId: _loggedInClientId,
+      profileImageBytes: _loggedInProfileImageBytes,
     );
   }
 }
