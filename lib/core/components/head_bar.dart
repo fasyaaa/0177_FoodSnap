@@ -5,15 +5,16 @@ import 'package:foody/core/constants/colors.dart';
 class HeadBar extends StatelessWidget implements PreferredSizeWidget {
   final String currentRoute;
   final void Function(String) onTabSelected;
-
-  /// Teks yang akan ditampilkan sebagai judul. Default: 'Food Snap'
   final String titleText;
+
+  final Widget? leading;
 
   const HeadBar({
     super.key,
     required this.currentRoute,
     required this.onTabSelected,
     this.titleText = 'Food Snap',
+    this.leading,
   });
 
   @override
@@ -21,7 +22,11 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: AppColors.background,
       elevation: 0,
-      titleSpacing: 16,
+      shape: const Border(
+        bottom: BorderSide(color: Colors.white12, width: 1.0),
+      ),
+      leading: leading,
+      titleSpacing: leading == null ? 16 : 0,
       automaticallyImplyLeading: false,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -58,7 +63,7 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
         isActive ? activeAsset : inactiveAsset,
         height: 24,
         width: 24,
-        color: AppColors.white,
+        colorFilter: const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
       ),
     );
   }
