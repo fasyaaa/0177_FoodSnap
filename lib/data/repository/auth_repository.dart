@@ -25,6 +25,7 @@ class AuthRepository {
         final loginResponse = LoginResponseModel.fromMap(jsonResponse);
         await secureStorage.write(key: "authToken", value: loginResponse.data!.token);
         await secureStorage.write(key: "UserRole", value: loginResponse.data!.role);
+        await secureStorage.write(key: "clientId", value: loginResponse.data!.id.toString());
         return Right(loginResponse);
       } else {
         return Left(jsonResponse['message'] ?? "Login failed");
