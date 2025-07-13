@@ -35,6 +35,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
           );
 
           emit(ProfileLoaded(
+            clientId: event.clientId,
             username: client.username,
             name: client.name,
             imgProfile: client.imgProfile,

@@ -12,12 +12,14 @@ final class ProfileInitial extends ProfileState {}
 final class ProfileLoading extends ProfileState {}
 
 final class ProfileLoaded extends ProfileState {
+  final int clientId;
   final String? username;
   final String? name;
   final String? imgProfile;
   final List<FeedsResponseModel> feeds;
 
   const ProfileLoaded({
+    required this.clientId,
     required this.username,
     required this.name,
     required this.imgProfile,
