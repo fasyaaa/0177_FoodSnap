@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:foody/core/constants/colors.dart';
@@ -5,13 +7,13 @@ import 'package:foody/core/constants/colors.dart';
 class CustomBottomBar extends StatelessWidget {
   final String currentRoute;
   final void Function(String route) onTabSelected;
-  final String? profileImageUrl;
+  final Uint8List? profileImageBytes;
 
   const CustomBottomBar({
     super.key,
     required this.currentRoute,
     required this.onTabSelected,
-    this.profileImageUrl,
+    this.profileImageBytes,
   });
 
   @override
@@ -53,32 +55,36 @@ class CustomBottomBar extends StatelessWidget {
           // Profile with image
           GestureDetector(
             onTap: () => onTabSelected('/profile'),
-            child: profileImageUrl != null
-                ? Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: currentRoute == '/profile'
-                            ? AppColors.white
-                            : Colors.transparent,
-                        width: 1.5,
+            child:
+                profileImageBytes != null
+                    ? Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color:
+                              currentRoute == '/profile'
+                                  ? AppColors.white
+                                  : Colors.transparent,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        radius: 13,
+                        backgroundImage: MemoryImage(profileImageBytes!),
+                      ),
+                    )
+                    : SvgPicture.asset(
+                      currentRoute == '/profile'
+                          ? 'assets/icons/profile_fill.svg'
+                          : 'assets/icons/profile_empty.svg',
+                      width: 26,
+                      height: 26,
+                      colorFilter: const ColorFilter.mode(
+                        AppColors.white,
+                        BlendMode.srcIn,
                       ),
                     ),
-                    child: CircleAvatar(
-                      radius: 13,
-                      backgroundImage: AssetImage(profileImageUrl!),
-                    ),
-                  )
-                : SvgPicture.asset(
-                    currentRoute == '/profile'
-                        ? 'assets/icons/profile_fill.svg'
-                        : 'assets/icons/profile_empty.svg',
-                    width: 26,
-                    height: 26,
-                    colorFilter:
-                        const ColorFilter.mode(AppColors.white, BlendMode.srcIn),
-                  ),
           ),
         ],
       ),
