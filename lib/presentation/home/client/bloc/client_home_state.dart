@@ -7,6 +7,7 @@ class ClientHomeState extends Equatable {
   final int? selectedFeedIdForComments;
   final List<CommentResponseModel> commentsForSelectedFeed;
   final bool isCommenting;
+  final int? clientId;
 
   const ClientHomeState({
     this.isLoading = false,
@@ -15,6 +16,7 @@ class ClientHomeState extends Equatable {
     this.selectedFeedIdForComments,
     this.commentsForSelectedFeed = const [],
     this.isCommenting = false,
+    this.clientId,
   });
 
   ClientHomeState copyWith({
@@ -24,6 +26,7 @@ class ClientHomeState extends Equatable {
     int? selectedFeedIdForComments,
     List<CommentResponseModel>? commentsForSelectedFeed,
     bool? isCommenting,
+    int? clientId,
   }) {
     return ClientHomeState(
       isLoading: isLoading ?? this.isLoading,
@@ -32,6 +35,7 @@ class ClientHomeState extends Equatable {
       selectedFeedIdForComments: selectedFeedIdForComments,
       commentsForSelectedFeed: commentsForSelectedFeed ?? this.commentsForSelectedFeed,
       isCommenting: isCommenting ?? this.isCommenting,
+      clientId: clientId ?? this.clientId,
     );
   }
 
@@ -43,6 +47,7 @@ class ClientHomeState extends Equatable {
         selectedFeedIdForComments,
         commentsForSelectedFeed,
         isCommenting,
+        clientId,
       ];
 }
 
