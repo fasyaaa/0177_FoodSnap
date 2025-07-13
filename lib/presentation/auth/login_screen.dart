@@ -1,4 +1,3 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -6,9 +5,7 @@ import 'package:foody/core/components/components.dart';
 import 'package:foody/core/constants/constants.dart';
 import 'package:foody/data/models/request/auth/login_request_model.dart';
 import 'package:foody/presentation/auth/bloc/login/login_bloc.dart';
-import 'package:foody/presentation/auth/register_screen.dart';
 import 'package:foody/presentation/home/admin/admin_home_screen.dart';
-import 'package:foody/presentation/home/client/client_home_screen.dart';
 import 'package:foody/core/components/custom_text_field.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -115,6 +112,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     } else if (state is LoginSuccess) {
                       final role =
                           state.responseModel.data?.role?.toLowerCase();
+                      final clientId = state.responseModel.data?.id;
+
                       if (!mounted) return;
 
                       if (role == 'admin') {
@@ -126,24 +125,20 @@ class _LoginScreenState extends State<LoginScreen> {
                           (route) => false,
                         );
                       } else if (role == 'client') {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              state.responseModel.message ?? 'Success',
+                        if (clientId != null) {
+                          Navigator.pushNamedAndRemoveUntil(
+                            context,
+                            '/home',
+                            arguments: clientId,
+                            (route) => false,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Client ID not found'),
                             ),
-                          ),
-                        );
-                        Future.delayed(Duration(milliseconds: 300), () {
-                          if (mounted) {
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const ClientHomeScreen(),
-                              ),
-                              (route) => false,
-                            );
-                          }
-                        });
+                          );
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Unknown Role')),
