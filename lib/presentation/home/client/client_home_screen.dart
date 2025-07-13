@@ -45,7 +45,7 @@ class ClientHomeScreen extends StatelessWidget {
           if (state.feeds.isEmpty) {
             return const Center(
               child: Text(
-                'Belum ada postingan.',
+                'No Posts Available',
                 style: TextStyle(color: AppColors.white),
               ),
             );
