@@ -5,7 +5,7 @@ class FeedsResponseModel {
   final int? idClient;
   final String? title;
   final String? description;
-  final dynamic imgFeeds;
+  final List<int>? imgFeeds;
   final String? locationName;
   final double? latitude;
   final double? longitude;
@@ -44,7 +44,7 @@ class FeedsResponseModel {
         idClient: json["id_client"],
         title: json["title"],
         description: json["description"],
-        imgFeeds: json["img_feeds"],
+        imgFeeds: json["img_feeds"] == null ? null : base64Decode(json["img_feeds"]),
         locationName: json["location_name"],
         latitude: json["latitude"]?.toDouble(),
         longitude: json["longitude"]?.toDouble(),
