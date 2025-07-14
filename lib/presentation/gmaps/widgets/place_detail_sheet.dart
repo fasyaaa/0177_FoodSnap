@@ -21,7 +21,11 @@ class PlaceDetailSheet extends StatelessWidget {
         children: [
           Text(
             place.name,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: AppColors.white),
+            style: const TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: AppColors.white,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
@@ -29,7 +33,7 @@ class PlaceDetailSheet extends StatelessWidget {
             style: const TextStyle(fontSize: 14, color: AppColors.grey),
           ),
           const SizedBox(height: 16),
-          // TODO: Tambahkan widget untuk "Saved in Favorites" di sini
+        
           const Divider(color: Colors.white24, height: 32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -38,7 +42,7 @@ class PlaceDetailSheet extends StatelessWidget {
               _buildActionButton(context, Icons.bookmark_border, 'Save'),
               _buildActionButton(context, Icons.share, 'Share'),
             ],
-          )
+          ),
         ],
       ),
     );
