@@ -6,7 +6,13 @@ import 'package:foody/presentation/profile/client/edit_profile/edit_profile_page
 
 class ActionButtons extends StatelessWidget {
   final VoidCallback onLogout;
-  const ActionButtons({super.key, required this.onLogout});
+  final int clientId;
+
+  const ActionButtons({
+    super.key,
+    required this.onLogout,
+    required this.clientId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -15,25 +21,15 @@ class ActionButtons extends StatelessWidget {
         Expanded(
           child: OutlinedButton(
             onPressed: () async {
-              final state = context.read<ProfileBloc>().state;
-              if (state is ProfileLoaded) {
-                final result = await Navigator.push<bool>(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) => EditProfilePage(clientId: state.clientId),
-                  ),
-                );
+              final result = await Navigator.push<bool>(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => EditProfilePage(clientId: clientId),
+                ),
+              );
 
-                if (result == true && context.mounted) {
-                  context.read<ProfileBloc>().add(LoadProfile(state.clientId));
-                }
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Profile data is not loaded yet.'),
-                  ),
-                );
+              if (result == true && context.mounted) {
+                context.read<ProfileBloc>().add(LoadProfile(clientId));
               }
             },
             style: _buttonStyle(),
