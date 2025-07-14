@@ -1,5 +1,6 @@
 part of 'client_home_bloc.dart';
 
+enum ActionStatus { initial, success, failure }
 class ClientHomeState extends Equatable {
   final bool isLoading;
   final String? errorMessage;
@@ -8,6 +9,8 @@ class ClientHomeState extends Equatable {
   final List<CommentResponseModel> commentsForSelectedFeed;
   final bool isCommenting;
   final int? clientId;
+  final ActionStatus actionStatus;
+  final String? successMessage;
 
   const ClientHomeState({
     this.isLoading = false,
@@ -17,6 +20,8 @@ class ClientHomeState extends Equatable {
     this.commentsForSelectedFeed = const [],
     this.isCommenting = false,
     this.clientId,
+    this.actionStatus = ActionStatus.initial,
+    this.successMessage,
   });
 
   ClientHomeState copyWith({
@@ -24,6 +29,8 @@ class ClientHomeState extends Equatable {
     String? errorMessage,
     List<FeedsResponseModel>? feeds,
     int? selectedFeedIdForComments,
+    ActionStatus? actionStatus,
+    String? successMessage,
     List<CommentResponseModel>? commentsForSelectedFeed,
     bool? isCommenting,
     int? clientId,
@@ -33,7 +40,8 @@ class ClientHomeState extends Equatable {
       errorMessage: errorMessage,
       feeds: feeds ?? this.feeds,
       selectedFeedIdForComments: selectedFeedIdForComments,
-      commentsForSelectedFeed: commentsForSelectedFeed ?? this.commentsForSelectedFeed,
+      commentsForSelectedFeed:
+          commentsForSelectedFeed ?? this.commentsForSelectedFeed,
       isCommenting: isCommenting ?? this.isCommenting,
       clientId: clientId ?? this.clientId,
     );
@@ -41,14 +49,14 @@ class ClientHomeState extends Equatable {
 
   @override
   List<Object?> get props => [
-        isLoading,
-        errorMessage,
-        feeds,
-        selectedFeedIdForComments,
-        commentsForSelectedFeed,
-        isCommenting,
-        clientId,
-      ];
+    isLoading,
+    errorMessage,
+    feeds,
+    selectedFeedIdForComments,
+    commentsForSelectedFeed,
+    isCommenting,
+    clientId,
+  ];
 }
 
 final class ClientHomeInitial extends ClientHomeState {}
