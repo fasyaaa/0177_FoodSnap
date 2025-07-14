@@ -11,7 +11,10 @@ class FeedRepository {
   FeedRepository(this._httpClient);
 
   /// Create a feed (with optional image)
-  Future<Either<String, FeedsResponseModel>> createFeed(FeedsRequestModel model, {String? imagePath}) async {
+  Future<Either<String, FeedsResponseModel>> createFeed(
+    FeedsRequestModel model, {
+    String? imagePath,
+  }) async {
     try {
       final response = await _httpClient.postMultipart(
         ApiPath.feeds,
@@ -23,8 +26,15 @@ class FeedRepository {
       final jsonResponse = json.decode(response.body);
 
       if (response.statusCode == 201) {
-        final data = FeedsResponseModel.fromMap(jsonResponse['data']);
-        return Right(data);
+        final createdFeed = FeedsResponseModel(
+          idFeeds: jsonResponse['feedId'],
+          title: model.title,
+          description: model.description,
+          locationName: model.locationName,
+          latitude: model.latitude,
+          longitude: model.longitude,
+        );
+        return Right(createdFeed);
       } else {
         return Left(jsonResponse['message'] ?? 'Failed to create feed');
       }
@@ -40,9 +50,10 @@ class FeedRepository {
       final jsonResponse = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        final feeds = (jsonResponse['data'] as List)
-            .map((e) => FeedsResponseModel.fromMap(e))
-            .toList();
+        final feeds =
+            (jsonResponse['data'] as List)
+                .map((e) => FeedsResponseModel.fromMap(e))
+                .toList();
         return Right(feeds);
       } else {
         return Left(jsonResponse['message'] ?? 'Failed to fetch feeds');
@@ -66,6 +77,34 @@ class FeedRepository {
       }
     } catch (e) {
       return Left('An error occurred while fetching feed: $e');
+    }
+  }
+
+  Future<Either<String, String>> updateFeed(
+    int id,
+    FeedsRequestModel model, {
+    String? imagePath,
+  }) async {
+    try {
+      final response =
+          await (imagePath != null
+              ? _httpClient.postMultipart(
+                '${ApiPath.feeds}/$id?_method=PUT',
+                model.toMap(),
+                fileField: 'img_feeds',
+                filePath: imagePath,
+              )
+              : _httpClient.put('${ApiPath.feeds}/$id', model.toMap()));
+
+      final jsonResponse = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        return Right(jsonResponse['message'] ?? 'Feed updated successfully');
+      } else {
+        return Left(jsonResponse['message'] ?? 'Failed to update feed');
+      }
+    } catch (e) {
+      return Left('An error occurred while updating feed: $e');
     }
   }
 
