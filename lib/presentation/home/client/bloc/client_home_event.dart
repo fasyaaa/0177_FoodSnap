@@ -11,6 +11,15 @@ class LoadFeeds extends ClientHomeEvent {}
 
 class RefreshFeeds extends ClientHomeEvent {}
 
+/// Event untuk menghapus sebuah feed berdasarkan ID-nya.
+class DeleteFeed extends ClientHomeEvent {
+  final int feedId;
+  const DeleteFeed(this.feedId);
+
+  @override
+  List<Object> get props => [feedId];
+}
+
 class ShowComments extends ClientHomeEvent {
   final int feedId;
   final List<CommentResponseModel> comments;
