@@ -1,12 +1,10 @@
-// presentation/gmaps/client_gmaps_display.dart (LENGKAP)
-
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:foody/core/components/custom_bottom_bar.dart';
-import 'package:foody/data/models/local/bookmark_place_model.dart'; 
+import 'package:foody/data/models/local/bookmark_place_model.dart';
 import 'package:foody/data/repository/client_repository.dart';
 import 'package:foody/data/repository/feed_repository.dart';
 import 'package:foody/presentation/gmaps/bloc/gmaps_event.dart';
@@ -75,24 +73,21 @@ class _ClientGmapsDisplayState extends State<ClientGmapsDisplay> {
         BlocProvider(
           create:
               (context) =>
-                  GmapsBloc()
-                    ..add(
-                      placeToShow != null
-                          ? ShowSavedPlace(
-                            placeToShow,
-                          )
-                          : InitializeMap(), 
-                    ),
+                  GmapsBloc()..add(
+                    placeToShow != null
+                        ? ShowSavedPlace(placeToShow)
+                        : InitializeMap(),
+                  ),
         ),
       ],
       child: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, profileState) {
           Uint8List? profileImageBytes;
           if (profileState is ProfileLoaded &&
-              profileState.imgProfile != null &&
-              profileState.imgProfile!.isNotEmpty) {
+              profileState.client.imgProfile != null &&
+              profileState.client.imgProfile!.isNotEmpty) {
             try {
-              profileImageBytes = base64Decode(profileState.imgProfile!);
+              profileImageBytes = base64Decode(profileState.client.imgProfile!);
             } catch (e) {
               print("Error decoding base64 in ClientGmapsDisplay: $e");
               profileImageBytes = null;
