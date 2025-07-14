@@ -1,5 +1,9 @@
+// presentation/gmaps/bloc/gmaps_event.dart
+
 import 'package:equatable/equatable.dart';
 import 'package:foody/presentation/gmaps/bloc/gmaps_state.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:foody/data/models/local/bookmark_place_model.dart';
 
 abstract class GmapsEvent extends Equatable {
   const GmapsEvent();
@@ -8,26 +12,50 @@ abstract class GmapsEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-// Event untuk menginisialisasi peta dan memuat marker awal
 class InitializeMap extends GmapsEvent {}
 
-// Event saat pengguna mengetik di search bar
-class QueryChanged extends GmapsEvent {
+class SearchSubmitted extends GmapsEvent {
   final String query;
-  const QueryChanged(this.query);
+  const SearchSubmitted(this.query);
 
   @override
   List<Object?> get props => [query];
 }
 
-// Event saat pengguna memilih salah satu saran lokasi
-class SuggestionSelected extends GmapsEvent {
+class PlaceSelected extends GmapsEvent {
   final Suggestion suggestion;
-  const SuggestionSelected(this.suggestion);
+  const PlaceSelected(this.suggestion);
 
   @override
   List<Object?> get props => [suggestion];
 }
 
-// Event untuk membersihkan hasil pencarian dan saran
+class MarkerTapped extends GmapsEvent {
+  final Suggestion suggestion;
+  const MarkerTapped(this.suggestion);
+
+  @override
+  List<Object?> get props => [suggestion];
+}
+
+/// Event baru saat pengguna mengetuk langsung di peta
+class MapTapped extends GmapsEvent {
+  final LatLng location;
+  const MapTapped(this.location);
+
+  @override
+  List<Object?> get props => [location];
+}
+
+class ClearSelectedSuggestion extends GmapsEvent {}
+
 class ClearSearch extends GmapsEvent {}
+
+// Class menampilkan tempat yang disimpan
+class ShowSavedPlace extends GmapsEvent {
+  final BookmarkPlace place;
+  const ShowSavedPlace(this.place);
+
+  @override
+  List<Object?> get props => [place];
+}
