@@ -1,79 +1,126 @@
+import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:foody/presentation/gmaps/bloc/gmaps_event.dart';
 import 'package:foody/presentation/gmaps/bloc/gmaps_state.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:rxdart/rxdart.dart';
 
 class GmapsBloc extends Bloc<GmapsEvent, GmapsState> {
   GmapsBloc() : super(const GmapsState()) {
     on<InitializeMap>(_onInitialize);
-    on<LocationPicked>(_onLocationPicked);
-    on<ClearPickedLocation>(_onClearPicked);
+    on<QueryChanged>(_onQueryChanged, transformer: (events, mapper) {
+      return events.debounceTime(const Duration(milliseconds: 500)).asyncExpand(mapper);
+    });
+    on<SuggestionSelected>(_onSuggestionSelected);
+    on<ClearSearch>(_onClearSearch);
   }
 
   Future<void> _onInitialize(
       InitializeMap event, Emitter<GmapsState> emit) async {
+    emit(state.copyWith(status: GmapsStatus.loading));
     try {
-      emit(state.copyWith(isLoading: true));
-      final pos = await _getPermission();
-      final latLng = LatLng(pos.latitude, pos.longitude);
+      final position = await _getCurrentLocationWithPermission();
+      final latLng = LatLng(position.latitude, position.longitude);
 
-      final placemarks = await placemarkFromCoordinates(pos.latitude, pos.longitude);
-      final p = placemarks.first;
-      final address = '${p.name}, ${p.locality}, ${p.country}';
+      final mockMarkers = {
+        Marker(
+          markerId: const MarkerId('post_1'),
+          position: LatLng(latLng.latitude + 0.01, latLng.longitude + 0.01),
+          infoWindow: const InfoWindow(title: 'Nasi Gorek Enak'),
+        ),
+      };
 
       emit(state.copyWith(
-        currentLocation: latLng,
-        currentAddress: address,
-        isLoading: false,
+        status: GmapsStatus.success,
+        initialPosition: latLng,
+        postMarkers: mockMarkers,
       ));
     } catch (e) {
-      emit(state.copyWith(currentLocation: const LatLng(0, 0), isLoading: false));
+      emit(state.copyWith(
+        status: GmapsStatus.failure,
+        errorMessage: e.toString(),
+      ));
     }
   }
 
-  Future<void> _onLocationPicked(
-      LocationPicked event, Emitter<GmapsState> emit) async {
-    final placemarks = await placemarkFromCoordinates(
-        event.latLng.latitude, event.latLng.longitude);
-    final p = placemarks.first;
+  Future<void> _onQueryChanged(
+      QueryChanged event, Emitter<GmapsState> emit) async {
+    if (event.query.length < 3) {
+      emit(state.copyWith(suggestions: []));
+      return;
+    }
 
-    final marker = Marker(
-      markerId: const MarkerId('picked'),
-      position: event.latLng,
-      infoWindow: InfoWindow(
-        title: p.name?.isNotEmpty == true ? p.name : 'Lokasi Dipilih',
-        snippet: '${p.street}, ${p.locality}',
-      ),
+    emit(state.copyWith(status: GmapsStatus.loading, clearError: true));
+    try {
+      final locations = await locationFromAddress(event.query);
+      final suggestions = <Suggestion>[];
+
+      for (var location in locations) {
+        // Ambil nama jalan untuk deskripsi yang lebih baik
+        final placemarks = await placemarkFromCoordinates(location.latitude, location.longitude);
+        if (placemarks.isNotEmpty) {
+          final p = placemarks.first;
+          suggestions.add(Suggestion(
+            description: "${p.name}, ${p.street}, ${p.subLocality}, ${p.locality}",
+            position: LatLng(location.latitude, location.longitude),
+          ));
+        }
+      }
+      
+      emit(state.copyWith(
+        status: GmapsStatus.success,
+        suggestions: suggestions,
+      ));
+
+    } catch (e) {
+      emit(state.copyWith(
+        status: GmapsStatus.failure,
+        errorMessage: 'Gagal mencari lokasi: $e',
+        suggestions: [],
+      ));
+    }
+  }
+  
+  void _onSuggestionSelected(SuggestionSelected event, Emitter<GmapsState> emit) {
+    final newMarker = Marker(
+      markerId: const MarkerId('search_result'),
+      position: event.suggestion.position,
+      infoWindow: InfoWindow(title: event.suggestion.description.split(',').first),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
     );
-
-    final address =
-        '${p.name}, ${p.street}, ${p.locality}, ${p.country}, ${p.postalCode}';
-
-    emit(state.copyWith(pickedMarker: marker, pickedAddress: address));
+    
+    emit(state.copyWith(
+      status: GmapsStatus.success,
+      suggestions: [], // Kosongkan saran setelah dipilih
+      searchResultMarker: newMarker,
+      cameraPosition: CameraPosition(target: event.suggestion.position, zoom: 16),
+    ));
   }
 
-  void _onClearPicked(ClearPickedLocation event, Emitter<GmapsState> emit) {
-    emit(state.copyWith(pickedMarker: null, pickedAddress: null));
+  void _onClearSearch(ClearSearch event, Emitter<GmapsState> emit) {
+    emit(state.copyWith(
+      suggestions: [],
+      clearSearchResult: true,
+    ));
   }
 
-  Future<Position> _getPermission() async {
+  Future<Position> _getCurrentLocationWithPermission() async {
+    // ... (kode izin lokasi tidak berubah)
     if (!await Geolocator.isLocationServiceEnabled()) {
-      throw 'Location service belum aktif';
+      throw 'Layanan lokasi belum aktif.';
     }
-
     LocationPermission perm = await Geolocator.checkPermission();
     if (perm == LocationPermission.denied) {
       perm = await Geolocator.requestPermission();
       if (perm == LocationPermission.denied) {
-        throw 'Izin lokasi ditolak';
+        throw 'Izin lokasi ditolak.';
       }
     }
     if (perm == LocationPermission.deniedForever) {
-      throw 'Izin Lokasi ditolak permanen';
+      throw 'Izin lokasi ditolak permanen.';
     }
-
     return Geolocator.getCurrentPosition();
   }
 }
