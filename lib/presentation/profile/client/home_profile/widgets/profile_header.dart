@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foody/core/constants/colors.dart';
 import 'package:foody/presentation/profile/client/bloc/profile_bloc.dart';
 import 'package:foody/presentation/profile/client/home_profile/widgets/profile_picture.dart';
 import 'package:foody/presentation/profile/client/home_profile/widgets/action_button.dart';
@@ -7,11 +8,7 @@ class ProfileHeader extends StatelessWidget {
   final ProfileLoaded state;
   final VoidCallback onLogout;
 
-  const ProfileHeader({
-    super.key,
-    required this.state,
-    required this.onLogout,
-  });
+  const ProfileHeader({super.key, required this.state, required this.onLogout});
 
   @override
   Widget build(BuildContext context) {
@@ -23,24 +20,35 @@ class ProfileHeader extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              ProfilePicture(imageUrl: state.imgProfile),
-              const SizedBox(width: 16), 
+              ProfilePicture(imageUrl: state.client.imgProfile),
+              const SizedBox(width: 16),
               Expanded(
-                child: Text(
-                  state.name ?? '',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      state.client.name ?? '',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      '@${state.client.username ?? ''}',
+                      style: const TextStyle(
+                        color: AppColors.grey,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-
-          ActionButtons(onLogout: onLogout),
+          ActionButtons(onLogout: onLogout, clientId: state.client.idClient!),
         ],
       ),
     );

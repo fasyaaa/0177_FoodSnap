@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:foody/core/constants/colors.dart';
 import 'package:foody/data/models/response/feeds/feed_response_model.dart';
@@ -40,10 +41,9 @@ class ProfileFeedGrid extends StatelessWidget {
           child: Container(
             color: AppColors.lightSheet,
             child: hasImage
-                ? Image.network(
-                    feed.imgFeeds!,
+                ? Image.memory( 
+                    Uint8List.fromList(feed.imgFeeds!),
                     fit: BoxFit.cover,
-                    loadingBuilder: (context, child, progress) => progress == null ? child : const Center(child: CircularProgressIndicator(strokeWidth: 2)),
                     errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, color: AppColors.grey),
                   )
                 : const Icon(Icons.image_not_supported, color: AppColors.grey),

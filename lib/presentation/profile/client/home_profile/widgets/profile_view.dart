@@ -20,55 +20,79 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProfileBloc, ProfileState>(
-      builder: (context, state) {
-        final String title =
-            state is ProfileLoaded ? state.username ?? 'Profile' : 'Profile';
-
-        // DIUBAH: Siapkan data gambar untuk CustomBottomBar
-        Uint8List? profileImageBytes;
-        if (state is ProfileLoaded &&
-            state.imgProfile != null &&
-            state.imgProfile!.isNotEmpty) {
-          try {
-            // Decode string base64 menjadi data gambar
-            profileImageBytes = base64Decode(state.imgProfile!);
-          } catch (e) {
-            print("Error decoding base64 in ProfileView: $e");
-            profileImageBytes = null; // Gagal decode, jangan tampilkan gambar
-          }
+    return BlocListener<ProfileBloc, ProfileState>(
+      listener: (context, state) {
+        if (state is ProfileActionSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else if (state is ProfileActionFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.error), backgroundColor: Colors.red),
+          );
         }
-
-        return Scaffold(
-          backgroundColor: AppColors.background,
-          appBar: HeadBar(
-            titleText: title,
-            currentRoute: '/profile',
-            onTabSelected: onTabSelected,
-          ),
-          body: _buildBody(context, state),
-          bottomNavigationBar: CustomBottomBar(
-            currentRoute: '/profile',
-            onTabSelected: onTabSelected,
-            // Berikan data gambar yang sudah di-decode ke bottom bar
-            profileImageBytes: profileImageBytes,
-          ),
-        );
       },
+      child: BlocBuilder<ProfileBloc, ProfileState>(
+        builder: (context, state) {
+          final String title =
+              state is ProfileLoaded
+                  ? state.client.username ?? 'Profile'
+                  : 'Profile';
+
+          Uint8List? profileImageBytes;
+          if (state is ProfileLoaded &&
+              state.client.imgProfile != null &&
+              state.client.imgProfile!.isNotEmpty) {
+            try {
+              profileImageBytes = base64Decode(state.client.imgProfile!);
+            } catch (e) {
+              print("Error decoding base64 in ProfileView: $e");
+              profileImageBytes = null;
+            }
+          }
+
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            appBar: HeadBar(
+              titleText: title,
+              currentRoute: '/profile',
+              onTabSelected: onTabSelected,
+            ),
+            body: _buildBody(context, state),
+            bottomNavigationBar: CustomBottomBar(
+              currentRoute: '/profile',
+              onTabSelected: onTabSelected,
+              profileImageBytes: profileImageBytes,
+            ),
+          );
+        },
+      ),
     );
   }
 
   Widget _buildBody(BuildContext context, ProfileState state) {
-    if (state is ProfileLoading) {
+    if (state is ProfileLoading || state is ProfileInitial) {
       return const Center(
-          child: CircularProgressIndicator(color: AppColors.primary));
+        child: CircularProgressIndicator(color: AppColors.primary),
+      );
     }
     if (state is ProfileLoaded) {
       return LoadedProfileBody(state: state, onLogout: onLogout);
     }
-    if (state is ProfileError) {
+    if (state is ProfileFailure) {
       return Center(
-          child: Text(state.message, style: const TextStyle(color: Colors.red)));
+        child: Text(state.error, style: const TextStyle(color: Colors.red)),
+      );
+    }
+
+    if (state is ProfileActionFailure) {
+      final lastState = context.read<ProfileBloc>().state;
+      if (lastState is ProfileLoaded) {
+        return LoadedProfileBody(state: lastState, onLogout: onLogout);
+      }
     }
     return const SizedBox.shrink();
   }
