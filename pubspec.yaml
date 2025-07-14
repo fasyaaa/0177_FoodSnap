@@ -54,6 +54,7 @@ dependencies:
   shared_preferences: ^2.5.3
   flutter_native_splash: ^2.4.6
   timeago: ^3.7.1
+  rxdart: ^0.28.0
 
 dev_dependencies:
   flutter_test:
