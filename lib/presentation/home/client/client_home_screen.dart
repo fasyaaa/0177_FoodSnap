@@ -63,12 +63,18 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     final currentRoute = ModalRoute.of(context)?.settings.name;
     if (currentRoute == route) return;
 
+    if (route == '/addFeed') {
+      Navigator.pushNamed(context, route);
+      return;
+    }
     if (route == '/profile') {
       if (_loggedInClientId != null) {
         Navigator.pushNamed(context, route, arguments: _loggedInClientId);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Client ID not available. Please login again.")),
+          const SnackBar(
+            content: Text("Client ID not available. Please login again."),
+          ),
         );
       }
     } else {
