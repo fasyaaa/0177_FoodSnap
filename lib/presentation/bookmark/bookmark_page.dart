@@ -14,8 +14,6 @@ import 'package:foody/presentation/bookmark/bookmark_list_page.dart';
 import 'package:foody/presentation/profile/client/bloc/profile_bloc.dart';
 import 'package:foody/service/database_helper.dart';
 
-/// Wrapper untuk menyediakan ProfileBloc ke halaman BookmarkPage.
-/// Pastikan Anda mendaftarkan widget ini di router (misal: di main.dart).
 class BookmarkPageWrapper extends StatelessWidget {
   const BookmarkPageWrapper({super.key});
 
@@ -32,7 +30,6 @@ class BookmarkPageWrapper extends StatelessWidget {
   }
 }
 
-/// Widget utama untuk halaman Bookmark.
 class BookmarkPage extends StatefulWidget {
   const BookmarkPage({super.key});
 
@@ -133,7 +130,7 @@ class _BookmarkPageState extends State<BookmarkPage> {
                     'assets/icons/smile.svg',
                   );
                   Navigator.pop(context);
-                  _loadLists(); 
+                  _loadLists();
                 }
               },
               child: const Text(
@@ -147,9 +144,8 @@ class _BookmarkPageState extends State<BookmarkPage> {
     );
   }
 
-
   void _showDeleteListDialog(BookmarkList list) {
-    if (!list.isCustom) return; 
+    if (!list.isCustom) return;
 
     showDialog(
       context: context,
@@ -176,7 +172,7 @@ class _BookmarkPageState extends State<BookmarkPage> {
                 onPressed: () async {
                   await _dbHelper.deleteCustomList(list.id);
                   Navigator.of(ctx).pop();
-                  _loadLists(); 
+                  _loadLists();
                 },
                 child: const Text(
                   'Delete',
@@ -200,8 +196,9 @@ class _BookmarkPageState extends State<BookmarkPage> {
         title: BlocBuilder<ProfileBloc, ProfileState>(
           builder: (context, state) {
             if (state is ProfileLoaded) {
+              // ✅ PERBAIKI: Akses username melalui state.client
               return Text(
-                state.username ?? 'Your Lists',
+                state.client.username ?? 'Your Lists',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               );
             }
@@ -311,11 +308,12 @@ class _BookmarkPageState extends State<BookmarkPage> {
       bottomNavigationBar: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
           Uint8List? profileImageBytes;
+          // ✅ PERBAIKI: Akses imgProfile melalui state.client
           if (state is ProfileLoaded &&
-              state.imgProfile != null &&
-              state.imgProfile!.isNotEmpty) {
+              state.client.imgProfile != null &&
+              state.client.imgProfile!.isNotEmpty) {
             try {
-              profileImageBytes = base64Decode(state.imgProfile!);
+              profileImageBytes = base64Decode(state.client.imgProfile!);
             } catch (e) {
               profileImageBytes = null;
             }
