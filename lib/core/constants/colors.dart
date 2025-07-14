@@ -9,6 +9,9 @@ class AppColors {
 
   static const Color secondary = Color(0xff6199f6);
 
+  static const Color pink = Color(0xffFF69B4); 
+  static const Color yellow = Color(0xffFFD700);
+  static const Color green = Color(0xff50C474);
   static const Color grey = Color(0xffA4A4A4);
 
   static const Color light = Color(0xffD0D0D0);
@@ -20,8 +23,6 @@ class AppColors {
   static const Color black = Color(0xff000000);
 
   static const Color white = Color(0xffFFFFFF);
-
-  static const Color green = Color(0xff50C474);
 
   static const Color red = Color(0xffF65151);
 
