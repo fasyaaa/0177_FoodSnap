@@ -41,10 +41,10 @@ class HeadBar extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
           _buildIconButton(
-            isActive: currentRoute == '/addPost',
+            isActive: currentRoute == '/addFeed',
             activeAsset: 'assets/icons/plus_fill.svg',
             inactiveAsset: 'assets/icons/plus_empty.svg',
-            onTap: () => onTabSelected('/addPost'),
+            onTap: () => onTabSelected('/addFeed'),
           ),
         ],
       ),
