@@ -20,7 +20,6 @@ class GmapsPage extends StatelessWidget {
   }
 }
 
-/// Widget utama yang menampilkan peta dan semua elemen UI terkait.
 class GmapView extends StatefulWidget {
   const GmapView({super.key});
 
@@ -204,17 +203,6 @@ class _GmapViewState extends State<GmapView> {
             ],
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Fitur Tambah Post belum diimplementasikan.'),
-            ),
-          );
-        },
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
