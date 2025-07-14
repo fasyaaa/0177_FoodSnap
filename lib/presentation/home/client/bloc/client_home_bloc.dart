@@ -16,12 +16,13 @@ class ClientHomeBloc extends Bloc<ClientHomeEvent, ClientHomeState> {
   final CommentRepository _commentRepository;
 
   ClientHomeBloc(this._feedRepository, this._commentRepository)
-    : super(ClientHomeInitial()) {
+    : super(const ClientHomeState()) {
     on<LoadFeeds>(_onLoadFeeds);
     on<RefreshFeeds>(_onRefreshFeeds);
     on<ShowComments>(_onShowComments);
     on<HideComments>(_onHideComments);
     on<PostComment>(_onPostComment);
+    on<DeleteFeed>(_onDeleteFeed);
   }
 
   Future<void> _onLoadFeeds(
@@ -47,6 +48,23 @@ class ClientHomeBloc extends Bloc<ClientHomeEvent, ClientHomeState> {
       (failure) =>
           emit(state.copyWith(isLoading: false, errorMessage: failure)),
       (feeds) => emit(state.copyWith(isLoading: false, feeds: feeds)),
+    );
+  }
+
+  /// Handler event DeleteFeed
+  Future<void> _onDeleteFeed(
+    DeleteFeed event,
+    Emitter<ClientHomeState> emit,
+  ) async {
+    final result = await _feedRepository.deleteFeed(event.feedId);
+    result.fold(
+      (error) {
+        print("Error deleting feed: $error");
+      },
+      (successMessage) {
+        print(successMessage); 
+        add(LoadFeeds());
+      },
     );
   }
 
